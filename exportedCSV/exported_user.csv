@@ -1,0 +1,20 @@
+name,id,email,age
+John Doe,1,john@example.com,28
+Jane Smith,2,jane.smith@example.com,34
+Bob Johnson,3,bob.j@example.com,45
+Alice Brown,4,alice.b@example.com,22
+Charlie Wilson,5,charlie.w@example.com,31
+John Doe,1,john@example.com,28
+Jane Smith,2,jane.smith@example.com,34
+Bob Johnson,3,bob.j@example.com,45
+Alice Brown,4,alice.b@example.com,22
+Charlie Wilson,5,charlie.w@example.com,31
+value1,,,value2
+value3,,,value4
+value1,,,value2
+value3,,,value4
+value1,,,value2
+value3,,,value4
+nishika,,,15
+bhavna,,,10
+mansi,,,10

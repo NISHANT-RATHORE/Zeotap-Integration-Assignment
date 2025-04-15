@@ -88,4 +88,19 @@ public class ClickHouseController {
         }
     }
 
+    @PostMapping("/export")
+    public ResponseEntity<?> exportDataToFlatFile(
+            @RequestParam("table") String tableName,
+            @RequestParam("filePath") String filePath) {
+
+        try {
+            log.info("Starting export of table '{}' to file '{}'", tableName, filePath);
+            clickHouseService.exportDataToFlatFile(tableName, filePath);
+            return ResponseEntity.ok("Data export completed successfully.");
+        } catch (Exception e) {
+            log.error("Error during data export: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body("Data export failed: " + e.getMessage());
+        }
+    }
+
 }

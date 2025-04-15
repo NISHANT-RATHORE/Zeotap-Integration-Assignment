@@ -4,13 +4,13 @@ import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.example.backend.Model.ClickHouseConnection;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.FileWriter;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -178,6 +178,34 @@ public class ClickHouseService {
         } catch (Exception e) {
             log.error("Error ingesting batch: {}", e.getMessage(), e);
             throw new RuntimeException("Batch ingestion failed", e);
+        }
+    }
+
+    public void exportDataToFlatFile(String tableName, String filePath) {
+        String query = "SELECT * FROM " + tableName;
+
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query);
+             FileWriter fileWriter = new FileWriter(filePath);
+             CSVPrinter csvPrinter = new CSVPrinter(fileWriter, CSVFormat.DEFAULT.withHeader(resultSet))) {
+
+            log.info("Exporting data from table '{}' to file '{}'", tableName, filePath);
+
+            // Write rows to the file
+            while (resultSet.next()) {
+                int columnCount = resultSet.getMetaData().getColumnCount();
+                Object[] row = new Object[columnCount];
+                for (int i = 1; i <= columnCount; i++) {
+                    row[i - 1] = resultSet.getObject(i);
+                }
+                csvPrinter.printRecord(row);
+            }
+
+            log.info("Data export completed successfully.");
+        } catch (Exception e) {
+            log.error("Error exporting data to flat file: {}", e.getMessage(), e);
+            throw new RuntimeException("Data export failed: " + e.getMessage());
         }
     }
 }
