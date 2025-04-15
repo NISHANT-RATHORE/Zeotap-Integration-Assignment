@@ -10,9 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/clickhouse")
 @Slf4j
 public class ClickHouseController {
 
@@ -38,4 +39,32 @@ public class ClickHouseController {
             return ResponseEntity.status(500).body(new ResponseDTO(null, "An error occurred: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/tables")
+    public ResponseEntity<List<String>> getTables() {
+        try {
+            log.info("Fetching tables from ClickHouse database...");
+            List<String> tables = clickHouseService.getTables();
+            log.info("successfully fetched tables: {}", tables);
+            return ResponseEntity.ok(tables);
+        } catch (Exception e) {
+            log.error("Error fetching tables: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/columns")
+    public ResponseEntity<List<String>> getTableColumns(@RequestParam("table") String tableName) {
+        try {
+            log.info("Fetching columns for table: {}", tableName);
+            List<String> columns = clickHouseService.getTableColumns(tableName);
+            log.info("successfully fetched columns for table '{}': {}", tableName, columns);
+            return ResponseEntity.ok(columns);
+        } catch (Exception e) {
+            log.error("Error fetching columns for table '{}': {}", tableName, e.getMessage(), e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+
 }
