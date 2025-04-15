@@ -14,7 +14,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Setter
 @Service
@@ -114,7 +116,7 @@ public class ClickHouseService {
             while (resultSet.next()) {
                 tables.add(resultSet.getString(1));
             }
-            if(tables.isEmpty()) {
+            if (tables.isEmpty()) {
                 log.warn("No tables found in the database.");
             } else {
                 log.info("Fetched tables: {}", tables);
@@ -136,7 +138,7 @@ public class ClickHouseService {
             while (resultSet.next()) {
                 columns.add(resultSet.getString(1)); // Column name is in the first column of the result
             }
-            if (columns.isEmpty()){
+            if (columns.isEmpty()) {
                 log.warn("No columns found for table '{}'", tableName);
             } else {
                 log.info("Fetched columns for table '{}': {}", tableName, columns);
@@ -145,6 +147,37 @@ public class ClickHouseService {
         } catch (SQLException e) {
             log.error("Error fetching columns for table '{}': {}", tableName, e.getMessage(), e);
             throw new RuntimeException("Error fetching columns", e);
+        }
+    }
+
+    public int ingestData(Stream<Map<String, String>> rowsStream, String tableName, int batchSize) {
+        List<Map<String, String>> batch = new ArrayList<>();
+        AtomicInteger totalRecords = new AtomicInteger();
+
+        rowsStream.forEach(row -> {
+            batch.add(row);
+            if (batch.size() == batchSize) {
+                totalRecords.addAndGet(ingestBatch(batch, tableName));
+                batch.clear();
+            }
+        });
+
+        // Process remaining records
+        if (!batch.isEmpty()) {
+            totalRecords.addAndGet(ingestBatch(batch, tableName));
+        }
+
+        return totalRecords.get();
+    }
+
+    private int ingestBatch(List<Map<String, String>> batch, String tableName) {
+        try {
+            log.info("Ingesting batch of size: {}", batch.size());
+            saveDyanamicData(batch, tableName);
+            return batch.size();
+        } catch (Exception e) {
+            log.error("Error ingesting batch: {}", e.getMessage(), e);
+            throw new RuntimeException("Batch ingestion failed", e);
         }
     }
 }

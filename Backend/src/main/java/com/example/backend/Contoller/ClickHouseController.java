@@ -1,5 +1,6 @@
 package com.example.backend.Contoller;
 
+import com.example.backend.DTO.IngestionResponse;
 import com.example.backend.DTO.ResponseDTO;
 import com.example.backend.Model.ClickHouseConnection;
 import com.example.backend.Service.ClickHouseService;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/clickhouse")
@@ -66,5 +69,23 @@ public class ClickHouseController {
         }
     }
 
+    @PostMapping(value = "/ingest", consumes = "application/json")
+    public ResponseEntity<?> ingestDataStream(
+            @RequestBody List<Map<String, String>> rows,
+            @RequestParam("table") String tableName,
+            @RequestParam(value = "batchSize", defaultValue = "1000") int batchSize) {
+
+        try {
+            log.info("Starting data ingestion for table: {} with batch size: {}", tableName, batchSize);
+            Stream<Map<String, String>> rowsStream = rows.stream();
+            int recordCount = clickHouseService.ingestData(rowsStream, tableName, batchSize);
+            log.info("Data ingestion successful. Records processed: {}", recordCount);
+
+            return ResponseEntity.ok(new IngestionResponse("Data ingestion successful", recordCount));
+        } catch (Exception e) {
+            log.error("Error during data ingestion: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(new IngestionResponse("Data ingestion failed: " + e.getMessage(), 0));
+        }
+    }
 
 }
