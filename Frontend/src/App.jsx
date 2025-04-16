@@ -1,6 +1,7 @@
 import SourceSelection from './Component/SourceSelection';
-import Dashboard from './Component/Dashboard';
+import ClickHouseDashboard from './Component/ClickHouseDashboard.jsx';
 import ConnectionForm from "./Component/ConnectionForm.jsx";
+import FlatFileDashboard from "./Component/FlatFileDashboard.jsx";
 import {Toaster} from 'react-hot-toast';
 import {Route, Routes} from "react-router-dom";
 
@@ -12,7 +13,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<SourceSelection />} />
                 <Route path="/connection-form" element={<ConnectionForm />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={<ClickHouseDashboard />} />
+                <Route path="/flat-file" element={<FlatFileDashboard/>} />
             </Routes>
         </div>
     );

@@ -14,7 +14,7 @@ const SourceSelection = () => {
         if (source === "ClickHouse") {
             navigate('/connection-form'); // Navigate to ConnectionForm
         } else if (source === "Flat File") {
-            alert('Flat File functionality is not implemented yet.');
+            navigate('/flat-file');
         } else {
             alert('Please select a source to proceed.');
         }

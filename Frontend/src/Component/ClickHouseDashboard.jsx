@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const Dashboard = () => {
+const ClickHouseDashboard = () => {
     const [tables, setTables] = useState([]);
     const [columns, setColumns] = useState([]);
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -211,7 +211,7 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default ClickHouseDashboard;
 
 //colourful ui
 // import React, { useState, useEffect } from 'react';
@@ -230,7 +230,7 @@ export default Dashboard;
 // } from '@mui/material';
 // import axios from 'axios';
 //
-// const Dashboard = () => {
+// const ClickHouseDashboard = () => {
 //     const [tables, setTables] = useState([]);
 //     const [columns, setColumns] = useState([]);
 //     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -374,7 +374,7 @@ export default Dashboard;
 //     return (
 //         <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
 //             <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl">
-//                 <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">ClickHouse Dashboard</h1>
+//                 <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">ClickHouse ClickHouseDashboard</h1>
 //
 //                 {loading && <div className="flex justify-center my-4"><CircularProgress /></div>}
 //
@@ -461,7 +461,7 @@ export default Dashboard;
 //     );
 // };
 //
-// export default Dashboard;
+// export default ClickHouseDashboard;
 
 
 

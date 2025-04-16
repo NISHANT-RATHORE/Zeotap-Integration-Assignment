@@ -4,7 +4,7 @@
     <data-source source="LOCAL" name="clickhousedb@localhost" uuid="6d668a25-ea7e-4759-acb4-d734b531bd63">
       <driver-ref>clickhouse</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>com.clickhouse.jdbc.ClickHouseDriver</jdbc-driver>
+      <jdbc-driver>ru.yandex.clickhouse.ClickHouseDriver</jdbc-driver>
       <jdbc-url>jdbc:clickhouse://localhost:8123/clickhousedb</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />

@@ -24,7 +24,7 @@ public class FlatFileService {
     @Autowired
     private ClickHouseService clickHouseService;
 
-    public String upload(MultipartFile file, String delimiter, String tableName) {
+    public List<Map<String, String>> upload(MultipartFile file, String delimiter, String tableName) {
         List<Map<String, String>> rows = new ArrayList<>();
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             log.info("Starting file upload for table: {}", tableName);
@@ -41,18 +41,17 @@ public class FlatFileService {
                 for (CSVRecord record : csvParser) {
                     rows.add(record.toMap());
                 }
-                log.info("save to clickhouse.....");
-                clickHouseService.saveDyanamicData(rows,tableName);
+                log.info("Saving data to ClickHouse...");
+                clickHouseService.saveDyanamicData(rows, tableName);
                 log.info("File parsed successfully. Total rows: {}", rows.size());
             }
-
-            return ResponseEntity.ok("File uploaded successfully! Parsed rows: " + rows).getBody();
         } catch (IOException e) {
             log.error("Error reading the file: {}", e.getMessage(), e);
-            return "Error processing file: " + e.getMessage();
+            throw new RuntimeException("Error processing file: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("Unexpected error occurred: {}", e.getMessage(), e);
-            return "An unexpected error occurred: " + e.getMessage();
+            throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
         }
+        return rows;
     }
 }
