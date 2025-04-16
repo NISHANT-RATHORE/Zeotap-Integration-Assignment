@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/api/clickhouse")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class ClickHouseController {
 
     @Autowired
@@ -89,17 +90,35 @@ public class ClickHouseController {
     }
 
     @PostMapping("/export")
-    public ResponseEntity<?> exportDataToFlatFile(
+    public ResponseEntity<?> exportSelectedColumnsToFlatFile(
             @RequestParam("table") String tableName,
-            @RequestParam("filePath") String filePath) {
+            @RequestParam("filePath") String filePath,
+            @RequestBody List<String> selectedColumns) {
 
         try {
-            log.info("Starting export of table '{}' to file '{}'", tableName, filePath);
-            clickHouseService.exportDataToFlatFile(tableName, filePath);
+            log.info("Starting export of selected columns '{}' from table '{}' to file '{}'", selectedColumns, tableName, filePath);
+            clickHouseService.exportSelectedColumnsToFlatFile(tableName, selectedColumns, filePath);
             return ResponseEntity.ok("Data export completed successfully.");
         } catch (Exception e) {
             log.error("Error during data export: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Data export failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validateToken(@RequestHeader(value = "Authorization") String token) {
+        try {
+            log.info("Validating JWT token: " + token);
+            token = token.substring(7); // Remove "Bearer " prefix
+            boolean isValid = jwtService.validateToken(token);
+            if (isValid) {
+                return ResponseEntity.ok(Boolean.TRUE);
+            } else {
+                return ResponseEntity.ok(Boolean.FALSE);
+            }
+        } catch (Exception e) {
+            log.error("Error validating token: {}", e.getMessage(), e);
+            throw new RuntimeException("Token validation failed: " + e.getMessage());
         }
     }
 
